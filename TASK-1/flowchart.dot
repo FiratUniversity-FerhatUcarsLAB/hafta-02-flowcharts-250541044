@@ -1,0 +1,50 @@
+digraph ATM {
+    node [fontname="Arial"];
+    
+    start [shape=oval, label="BAŞLA"];
+    pin_input [shape=parallelogram, label="OKU PIN"];
+    check_pin [shape=diamond, label="PIN doğru mu?"];
+    wrong_pin [shape=box, label="PIN_HAK = PIN_HAK - 1"];
+    pin_retry [shape=diamond, label="PIN_HAK > 0?"];
+    block_card [shape=oval, label="Kart bloke edildi\nBITIR"];
+    correct_pin [shape=box, label="PIN doğrulandı"];
+    
+    loop_start [shape=diamond, label="İşlem devam mı?"];
+    amount_input [shape=parallelogram, label="OKU TUTAR"];
+    check_multiple [shape=diamond, label="TUTAR % 20 = 0?"];
+    check_balance [shape=diamond, label="TUTAR ≤ BAKIYE?"];
+    check_limit [shape=diamond, label="GÜNLÜK_CEKILEN + TUTAR ≤ GÜNLÜK_LIMIT?"];
+    update_balance [shape=box, label="BAKIYE -= TUTAR\nGÜNLÜK_CEKILEN += TUTAR"];
+    success [shape=parallelogram, label="YAZ: İşlem başarılı"];
+    repeat_prompt [shape=parallelogram, label="OKU: Başka işlem? (E/H)"];
+    repeat_check [shape=diamond, label="CEVAP = E?"];
+    end [shape=oval, label="İyi günler\nBITIR"];
+    
+    start -> pin_input;
+    pin_input -> check_pin;
+    check_pin -> correct_pin [label="EVET"];
+    check_pin -> wrong_pin [label="HAYIR"];
+    wrong_pin -> pin_retry;
+    pin_retry -> pin_input [label="EVET"];
+    pin_retry -> block_card [label="HAYIR"];
+    correct_pin -> loop_start;
+    
+    loop_start -> amount_input [label="EVET"];
+    loop_start -> end [label="HAYIR"];
+    
+    amount_input -> check_multiple;
+    check_multiple -> check_balance [label="EVET"];
+    check_multiple -> amount_input [label="HAYIR"];
+    
+    check_balance -> check_limit [label="EVET"];
+    check_balance -> amount_input [label="HAYIR"];
+    
+    check_limit -> update_balance [label="EVET"];
+    check_limit -> amount_input [label="HAYIR"];
+    
+    update_balance -> success;
+    success -> repeat_prompt;
+    repeat_prompt -> repeat_check;
+    repeat_check -> loop_start [label="EVET"];
+    repeat_check -> end [label="HAYIR"];
+}
